@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <title>Wasm</title>
+    <script src="../../timer.js"></script>
+  </head>
+  <body>
+    <style>
+      #output {
+        height: 400px;
+        width: 200px;
+      }
+    </style>
+    <h1 id="status">Status: Waiting</h1>
+    <textarea id="output"></textarea>
+    <script type="text/javascript">
+      var Module = {
+        preRun: [],
+        postRun: [
+          function () {
+            const date = new Date()
+            const time = date.getTime()
+            const obj = {
+              tech: 'wasm',
+              app: 'fibonacci',
+              time
+            }
+            socket.send(JSON.stringify(obj))
+
+            const status = document.querySelector('#status')
+            status.textContent = 'Status: Finished'
+          }
+        ],
+        preInit: function () {
+          const status = document.querySelector('#status')
+          status.textContent = 'Status: Running'
+        },
+        print: (function () {
+          const output = document.querySelector('#output')
+          if (output) {
+            output.value = ''
+          }
+
+          return function (text) {
+            if (arguments.length > 1) {
+              text = Array.prototype.slice.call(arguments).join(' ')
+            }
+
+            console.log(text)
+
+            if (output) {
+              output.value += text + '\n'
+              output.scrollTop = output.scrollHeight
+            }
+          }
+        })()
+      }
+    </script>
+    <script async src="fibonacci.js"></script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Main page</title>
+  </head>
+  <body>
+    <button onclick="wasmFib()">Run wasm</button>
+    <button onclick="asmFib()">Run asm</button>
+    <button onclick="pnaclFib()">Run PNaCl</button>
+    <button onclick="xFib()">Run activex</button>
+    <button onclick="appFib()">Run applet</button>
+
+    <script>
+      const socket = new WebSocket('ws://localhost:4000/timer/start')
+      let tech = ''
+      let app = ''
+
+      socket.addEventListener('message', async event => {
+        fetch(`http://localhost:4000/start/${tech}/${app}`)
+      })
+
+      const startTime = () => {
+        const date = new Date()
+        const time = date.getTime()
+        socket.send(JSON.stringify({ tech, app, time }))
+      }
+
+      const wasmFib = async event => {
+        tech = 'wasm'
+        app = 'fibonacci'
+        startTime()
+      }
+
+      const xFib = async event => {
+        tech = 'activex'
+        app = 'fibonacci'
+        startTime()
+      }
+
+      const appFib = async event => {
+        tech = 'applet'
+        app = 'fibonacci'
+        startTime()
+        //await window.fetch('http://localhost:4000/start/applet/fibonacci')
+      }
+
+      const asmFib = async event => {
+        tech = 'asm'
+        app = 'fibonacci'
+        startTime()
+      }
+
+      const pnaclFib = async event => {
+        tech = 'pnacl'
+        app = 'fibonacci'
+        startTime()
+        //await window.fetch('http://localhost:4000/start/pnacl/fibonacci')
+      }
+    </script>
+  </body>
+</html>

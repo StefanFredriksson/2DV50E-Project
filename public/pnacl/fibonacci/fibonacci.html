@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PNaCl</title>
+    <script src='../../timer.js'></script>
+    <script type="text/javascript">
+      FibonacciModule = null
+      statusText = 'NO-STATUS'
+
+      function moduleDidLoad() {
+        FibonacciModule = document.querySelector('#fibonacci')
+        updateStatus('SUCCESS')
+        FibonacciModule.postMessage("Hello")
+      }
+
+      function handleMessage(message_event) {
+        console.log('HELLO????')
+        const date = new Date()
+            const time = date.getTime()
+            const obj = {
+              tech: 'pnacl',
+              app: 'fibonacci',
+              time
+            }
+            socket.send(JSON.stringify(obj))
+      }
+
+      function pageDidLoad() {
+        if (FibonacciModule === null) {
+          updateStatus('LOADING...')
+        } else {
+          updateStatus()
+        }
+      }
+
+      function updateStatus(opt_message) {
+        if (opt_message) {
+          statusText = opt_message
+        }
+
+        const statusField = document.querySelector('#statusField')
+        
+        if (statusField) {
+          statusField.textContent = statusText
+        }
+      }
+    </script>
+  </head>
+  <body onload="pageDidLoad()">
+    <h1>PNaCl page</h1>
+    <p>
+      <div id="listener">
+        <script type="text/javascript">
+          var listener = document.getElementById('listener');
+          listener.addEventListener('load', moduleDidLoad, true);
+          listener.addEventListener('message', handleMessage, true);
+        </script>
+  
+        <embed id="fibonacci"
+               width=0 height=0
+               src="fibonacci.nmf"
+               type="application/x-pnacl" />
+      </div>
+    </p>
+
+    <h2>Status <code id="statusField">NO-STATUS</code></h2>
+  </body>
+</html>
