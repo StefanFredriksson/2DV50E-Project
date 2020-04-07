@@ -57,6 +57,11 @@
           }
         })()
       }
+
+      Module.onRuntimeInitialized = function () {
+        const f = Module.cwrap('getCount', 'number', ['number'])
+        console.log(f(7))
+      }
     </script>
     <script async src="fibonacci.js"></script>
   </body>

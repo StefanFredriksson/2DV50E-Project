@@ -1,18 +1,26 @@
-// Fibonacci.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
 
 int nthFibonacci(int n);
 
+int execTime = 0;
+
 int main()
 {
-  const int size = 40;
+  const int size = 43;
+
+  auto startTime = high_resolution_clock::now();
 
   for (int i = 1; i <= size; i++)
   {
-    printf("%d: %d\n", i, nthFibonacci(i));
+    nthFibonacci(i);
   }
+
+  auto endTime = high_resolution_clock::now();
+  execTime = duration_cast<milliseconds>(endTime - startTime).count();
 }
 
 int nthFibonacci(int n)
@@ -34,4 +42,12 @@ int nthFibonacci(int n)
   int sum = nthFibonacci(n - 1) + nthFibonacci(n - 2);
 
   return sum;
+}
+
+extern "C"
+{
+  int getCount(int num)
+  {
+    return num;
+  }
 }

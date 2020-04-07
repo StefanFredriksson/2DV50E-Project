@@ -99,6 +99,11 @@ router.get('/activex/fibonacci', (req, res) => {
   )
 })
 
+router.get('/testing', (req, res) => {
+  console.log('We made it!')
+  res.send('<h1>OK</h1>')
+})
+
 const measureUsage = () => {
   usage = []
   interval = setInterval(async () => {
