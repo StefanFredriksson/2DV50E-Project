@@ -41,7 +41,9 @@ const byTechnology = async app => {
     for (const key of keys) {
       if (Array.isArray(json[key][app])) {
         for (const data of json[key][app]) {
-          execTimes.push(data.execTime)
+          if (data.execTime) {
+            execTimes.push(data.execTime)
+          }
         }
       }
     }

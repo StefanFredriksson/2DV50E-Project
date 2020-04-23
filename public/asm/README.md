@@ -16,5 +16,5 @@ emsdk_env.bat
 Next navigate to the folder containing the cpp file and run the following command to compile into asm code.
 
 ```
-emcc <name of file>.cpp -s WASM=0 -o <name of file>.js -s "EXPORTED_FUNCTIONS=['_<name of function>']" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+emcc -O3 <name of file>.cpp -s WASM=0 -o <name of file>.js -s "EXPORTED_FUNCTIONS=['_<name of function>','_main']" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']" -s ALLOW_MEMORY_GROWTH=1
 ```

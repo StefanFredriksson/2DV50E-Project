@@ -21,7 +21,7 @@ int main()
 
 void run()
 {
-  const int SIZE = 100000000;
+  const int SIZE = 30000000;
   int *arr = new int[SIZE];
   srand(time(NULL));
 
@@ -29,6 +29,15 @@ void run()
   {
     int val = rand() % 10 + 1;
     arr[i] = val;
+  }
+
+  for (int i = 0; i < SIZE; i++)
+  {
+    int val1 = rand() % SIZE;
+    int val2 = rand() % SIZE;
+    int temp = arr[val1];
+    arr[val1] = arr[val2];
+    arr[val2] = temp;
   }
 
   delete[] arr;

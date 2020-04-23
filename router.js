@@ -61,6 +61,7 @@ router.ws('/timer/end', (ws, req) => {
 })
 
 router.get('/timer/end', async (req, res) => {
+  //currentBrowser = 'iexplore'
   const { tech, app, time, execTime } = req.query
   let json = {}
   clearInterval(interval)
