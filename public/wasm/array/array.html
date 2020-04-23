@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-    <title>Asm</title>
+    <title>Wasm</title>
     <script src="../../js/timer.js"></script>
   </head>
   <body>
@@ -33,8 +33,6 @@
               text = Array.prototype.slice.call(arguments).join(' ')
             }
 
-            console.log(text)
-
             if (output) {
               output.value += text + '\n'
               output.scrollTop = output.scrollHeight
@@ -50,19 +48,18 @@
           const exTime = Module.cwrap('getExecTime', 'number', [])
           const execTime = exTime()
           const obj = {
-            tech: 'asm',
-            app: 'fibonacci',
+            tech: 'wasm',
+            app: 'array',
             time,
             execTime
           }
           socket.send(JSON.stringify(obj))
-
+          window.close()
           const status = document.querySelector('#status')
           status.textContent = 'Status: Finished'
-          window.close()
         }
       ]
     </script>
-    <script async src="fibonacci.js"></script>
+    <script async src="array.js"></script>
   </body>
 </html>

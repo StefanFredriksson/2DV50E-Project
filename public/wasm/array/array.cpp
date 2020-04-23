@@ -1,47 +1,37 @@
-#include <iostream>
+// LargeArray.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <stdlib.h>
+#include <time.h>
 #include <chrono>
 
 using namespace std;
 using namespace std::chrono;
 
-int nthFibonacci(int n);
-
+void run();
 int execTime = 0;
 
 int main()
 {
-  const int size = 43;
-
   high_resolution_clock::time_point startTime = high_resolution_clock::now();
-
-  for (int i = 1; i <= size; i++)
-  {
-    nthFibonacci(i);
-  }
-
+  run();
   high_resolution_clock::time_point endTime = high_resolution_clock::now();
   execTime = duration_cast<milliseconds>(endTime - startTime).count();
 }
 
-int nthFibonacci(int n)
+void run()
 {
-  if (n <= 0)
+  const int SIZE = 100000000;
+  int *arr = new int[SIZE];
+  srand(time(NULL));
+
+  for (int i = 0; i < SIZE; i++)
   {
-    throw "The value passed to the method must be positive.";
+    int val = rand() % 10 + 1;
+    arr[i] = val;
   }
 
-  if (n == 1)
-  {
-    return 0;
-  }
-  else if (n == 2)
-  {
-    return 1;
-  }
-
-  int sum = nthFibonacci(n - 1) + nthFibonacci(n - 2);
-
-  return sum;
+  delete[] arr;
 }
 
 extern "C"

@@ -3,22 +3,35 @@ const open = require('open')
 const path = require('path')
 const si = require('systeminformation')
 const fse = require('fs-extra')
+const { byTechnology } = require('./utils/graphData')
 const root = 'http://localhost:4000'
 let interval
 let usage
+let currentBrowser = ''
+let startSocket = null
 
 router.ws('/timer/start', (ws, req) => {
   ws.on('message', async event => {
+    startSocket = ws
     let json = {}
     const data = JSON.parse(event)
+    currentBrowser = data.browser
     json = require(`./lib/${data.tech}.json`)
-    json[data.app].push({ startTime: data.time, endTime: 0 })
+
+    if (json[data.browser] === undefined) {
+      json[data.browser] = {}
+    }
+    if (json[data.browser][data.app] === undefined) {
+      json[data.browser][data.app] = []
+    }
+
+    json[data.browser][data.app].push({ startTime: data.time, endTime: 0 })
     await fse.writeFile(
       path.join(__dirname, 'lib', `${data.tech}.json`),
       JSON.stringify(json, null, 2)
     )
     measureUsage()
-    ws.send('message')
+    ws.send(JSON.stringify({ testFinished: false }))
   })
 })
 
@@ -28,79 +41,75 @@ router.ws('/timer/end', (ws, req) => {
     clearInterval(interval)
     const data = JSON.parse(event)
     json = require(`./lib/${data.tech}.json`)
-    json[data.app][json[data.app].length - 1].endTime = data.time
-    json[data.app][json[data.app].length - 1].usage = usage
+    json[currentBrowser][data.app][
+      json[currentBrowser][data.app].length - 1
+    ].endTime = data.time
+    json[currentBrowser][data.app][
+      json[currentBrowser][data.app].length - 1
+    ].execTime = data.execTime
+    json[currentBrowser][data.app][
+      json[currentBrowser][data.app].length - 1
+    ].usage = usage
     await fse.writeFile(
       path.join(__dirname, 'lib', `${data.tech}.json`),
       JSON.stringify(json, null, 2)
     )
+
+    const graph = await byTechnology(data.app)
+    startSocket.send(JSON.stringify({ testFinished: true, graph }))
   })
 })
 
 router.get('/timer/end', async (req, res) => {
-  const { tech, app, time } = req.query
+  const { tech, app, time, execTime } = req.query
   let json = {}
   clearInterval(interval)
-
   json = require(`./lib/${tech}.json`)
-  json[app][json[app].length - 1].endTime = parseInt(time)
-  json[app][json[app].length - 1].usage = usage
+  json[currentBrowser][app][
+    json[currentBrowser][app].length - 1
+  ].endTime = parseInt(time)
+  json[currentBrowser][app][
+    json[currentBrowser][app].length - 1
+  ].execTime = parseInt(execTime)
+  json[currentBrowser][app][json[currentBrowser][app].length - 1].usage = usage
   await fse.writeFile(
     path.join(__dirname, 'lib', `${tech}.json`),
     JSON.stringify(json, null, 2)
   )
 
-  res.json({ message: 'OK' })
+  const graph = await byTechnology(app)
+  startSocket.send(JSON.stringify({ testFinished: true, graph }))
+
+  res.send('<h1>OK</h1>')
 })
 
 router.get('/', (req, res) => {
   res.sendFile(__dirname, 'public', 'index.html')
 })
 
-router.get('/start/:tech/:app', async (req, res) => {
-  const { tech, app } = req.params
+router.get('/start/:tech/:app/:browser', async (req, res) => {
+  const { tech, app, browser } = req.params
 
-  if (tech !== 'applet' && tech !== 'activex') {
-    open(`${root}/${tech}/${app}`)
-  } else {
-    open(`${root}/${tech}/${app}`, { app: 'iexplore' })
-  }
+  open(`${root}/${tech}/${app}`, { app: browser })
 
   res.json({ message: 'OK' })
 })
 
-router.get('/wasm/fibonacci', (req, res) => {
+router.get('/:tech/fibonacci', (req, res) => {
+  const { tech } = req.params
+
   res.sendFile(
-    path.join(__dirname, 'public', 'wasm', 'Fibonacci', 'fibonacci.html')
+    path.join(__dirname, 'public', tech, 'fibonacci', 'fibonacci.html')
   )
 })
 
-router.get('/asm/fibonacci', (req, res) => {
-  res.sendFile(
-    path.join(__dirname, 'public', 'asm', 'Fibonacci', 'fibonacci.html')
-  )
-})
+router.get('/:tech/array', (req, res) => {
+  const { tech } = req.params
 
-router.get('/pnacl/fibonacci', (req, res) => {
-  res.sendFile(
-    path.join(__dirname, 'public', 'pnacl', 'Fibonacci', 'fibonacci.html')
-  )
-})
-
-router.get('/applet/fibonacci', async (req, res) => {
-  res.sendFile(
-    path.join(__dirname, 'public', 'applet', 'Fibonacci', 'index.html')
-  )
-})
-
-router.get('/activex/fibonacci', (req, res) => {
-  res.sendFile(
-    path.join(__dirname, 'public', 'activex', 'fibonacci', 'FibonacciCtl.html')
-  )
+  res.sendFile(path.join(__dirname, 'public', tech, 'array', 'array.html'))
 })
 
 router.get('/testing', (req, res) => {
-  console.log('We made it!')
   res.send('<h1>OK</h1>')
 })
 

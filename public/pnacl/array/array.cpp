@@ -1,6 +1,8 @@
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
+#include <stdlib.h>
+#include <time.h>
 #include <chrono>
 
 using namespace std;
@@ -13,14 +15,9 @@ public:
   virtual ~FibonacciInstance() {}
   virtual void HandleMessage(const pp::Var &var_message)
   {
-    const int SIZE = 43;
-
     high_resolution_clock::time_point startTime = high_resolution_clock::now();
 
-    for (int i = 1; i <= SIZE; i++)
-    {
-      nthFibonacci(i);
-    }
+    run();
 
     high_resolution_clock::time_point endTime = high_resolution_clock::now();
     int execTime = duration_cast<milliseconds>(endTime - startTime).count();
@@ -29,25 +26,19 @@ public:
   }
 
 private:
-  int nthFibonacci(int n)
+  void run()
   {
-    if (n <= 0)
+    const int SIZE = 100000000;
+    int *arr = new int[SIZE];
+    srand(time(NULL));
+
+    for (int i = 0; i < SIZE; i++)
     {
-      throw "The value passed to the method must be positive.";
+      int val = rand() % 10 + 1;
+      arr[i] = val;
     }
 
-    if (n == 1)
-    {
-      return 0;
-    }
-    else if (n == 2)
-    {
-      return 1;
-    }
-
-    int sum = nthFibonacci(n - 1) + nthFibonacci(n - 2);
-
-    return sum;
+    delete[] arr;
   }
 };
 

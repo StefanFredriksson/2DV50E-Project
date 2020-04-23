@@ -33,8 +33,6 @@
               text = Array.prototype.slice.call(arguments).join(' ')
             }
 
-            console.log(text)
-
             if (output) {
               output.value += text + '\n'
               output.scrollTop = output.scrollHeight
@@ -51,7 +49,7 @@
           const execTime = exTime()
           const obj = {
             tech: 'asm',
-            app: 'fibonacci',
+            app: 'array',
             time,
             execTime
           }
@@ -63,6 +61,6 @@
         }
       ]
     </script>
-    <script async src="fibonacci.js"></script>
+    <script async src="array.js"></script>
   </body>
 </html>

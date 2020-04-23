@@ -2,60 +2,98 @@
 <html>
   <head>
     <title>Main page</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <button onclick="wasmFib()">Run wasm</button>
-    <button onclick="asmFib()">Run asm</button>
-    <button onclick="pnaclFib()">Run PNaCl</button>
-    <button onclick="xFib()">Run activex</button>
-    <button onclick="appFib()">Run applet</button>
+    <div id="ui">
+      <select id="app-select">
+        <option value="fibonacci">Fibonacci</option>
+        <option value="array">Array</option>
+      </select>
+      <select id="tech-select">
+        <option value="wasm">WebAssembly</option>
+        <option value="asm">Asm.js</option>
+        <option value="pnacl">PNaCl</option>
+        <option value="applet">Java applet</option>
+        <option value="activex">ActiveX</option>
+      </select>
+      <select id="browser-select">
+        <!--<option value="chrome">Google Chrome</option>
+        <option value="firefox">Firefox</option>
+        <option value="msedge">Microsoft Edge</option>
+        <option value="iexplore">Internet Explorer</option>-->
+      </select>
+      <button id="start-tests" onclick="startTests()">Start tests</button>
+      <h2 id="status">Status: IDLE</h2>
+    </div>
+    <canvas id="chart-container"></canvas>
 
+    <script src="js/populateBrowser.js"></script>
     <script>
+      populateBrowser()
+      const maxTests = 1
       const socket = new WebSocket('ws://localhost:4000/timer/start')
       let tech = ''
       let app = ''
+      let browser = ''
+      let testCount = 0
+      let chart = null
 
       socket.addEventListener('message', async event => {
-        fetch(`http://localhost:4000/start/${tech}/${app}`)
+        const { testFinished, graph } = JSON.parse(event.data)
+
+        if (!testFinished) {
+          testCount++
+          fetch(`http://localhost:4000/start/${tech}/${app}/${browser}`)
+        } else {
+          if (testCount < maxTests) {
+            startTests()
+          } else {
+            const button = document.querySelector('#start-tests')
+            const status = document.querySelector('#status')
+            status.textContent = 'Status: FINISHED'
+            button.disabled = false
+            renderGraph(graph)
+          }
+        }
       })
 
-      const startTime = () => {
+      const renderGraph = data => {
+        var ctx = document.getElementById('chart-container').getContext('2d')
+
+        if (chart) {
+          chart.destroy()
+        }
+
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: `${app}: execution time`,
+                backgroundColor: 'rgb(55, 55, 133)',
+                borderColor: 'rgb(135, 135, 248)',
+                data: data.data
+              }
+            ]
+          }
+        })
+      }
+
+      const startTests = () => {
+        tech = document.querySelector('#tech-select').value
+        app = document.querySelector('#app-select').value
+        browser = document.querySelector('#browser-select').value
+        const status = document.querySelector('#status')
+        const button = document.querySelector('#start-tests')
+        button.disabled = true
+        status.textContent = 'Status: RUNNING'
         const date = new Date()
         const time = date.getTime()
-        socket.send(JSON.stringify({ tech, app, time }))
-      }
-
-      const wasmFib = async event => {
-        tech = 'wasm'
-        app = 'fibonacci'
-        startTime()
-      }
-
-      const xFib = async event => {
-        tech = 'activex'
-        app = 'fibonacci'
-        startTime()
-      }
-
-      const appFib = async event => {
-        tech = 'applet'
-        app = 'fibonacci'
-        startTime()
-        //await window.fetch('http://localhost:4000/start/applet/fibonacci')
-      }
-
-      const asmFib = async event => {
-        tech = 'asm'
-        app = 'fibonacci'
-        startTime()
-      }
-
-      const pnaclFib = async event => {
-        tech = 'pnacl'
-        app = 'fibonacci'
-        startTime()
-        //await window.fetch('http://localhost:4000/start/pnacl/fibonacci')
+        socket.send(JSON.stringify({ tech, app, browser, time }))
       }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   </body>
 </html>
