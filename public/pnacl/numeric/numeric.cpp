@@ -8,16 +8,16 @@
 using namespace std;
 using namespace std::chrono;
 
-class ArrayInstance : public pp::Instance
+class NumericInstance : public pp::Instance
 {
 public:
-  explicit ArrayInstance(PP_Instance instance) : pp::Instance(instance) {}
-  virtual ~ArrayInstance() {}
+  explicit NumericInstance(PP_Instance instance) : pp::Instance(instance) {}
+  virtual ~NumericInstance() {}
   virtual void HandleMessage(const pp::Var &var_message)
   {
     high_resolution_clock::time_point startTime = high_resolution_clock::now();
 
-    run();
+    doNumericComputations();
 
     high_resolution_clock::time_point endTime = high_resolution_clock::now();
     int execTime = duration_cast<milliseconds>(endTime - startTime).count();
@@ -26,40 +26,44 @@ public:
   }
 
 private:
-  void run()
+  void doNumericComputations()
   {
-    const int SIZE = 30000000;
-    int *arr = new int[SIZE];
     srand(time(NULL));
+    const int SIZE = 100000000;
 
     for (int i = 0; i < SIZE; i++)
     {
-      int val = rand() % 10 + 1;
-      arr[i] = val;
-    }
+      int num1 = rand() % 10 + 1;
+      int num2 = rand() % 10 + 1;
 
-    for (int i = 0; i < SIZE; i++)
-    {
-      int val1 = rand() % SIZE;
-      int val2 = rand() % SIZE;
-      int temp = arr[val1];
-      arr[val1] = arr[val2];
-      arr[val2] = temp;
-    }
+      if (num1 < num2)
+      {
+        num1 = 1;
+      }
 
-    delete[] arr;
+      if (num2 < num1)
+      {
+        num2 = 1;
+      }
+
+      if (num1 == num2)
+      {
+        num1 = 1;
+        num2 = 1;
+      }
+    }
   }
 };
 
-class ArrayModule : public pp::Module
+class NumericModule : public pp::Module
 {
 public:
-  ArrayModule() : pp::Module() {}
-  virtual ~ArrayModule() {}
+  NumericModule() : pp::Module() {}
+  virtual ~NumericModule() {}
 
   virtual pp::Instance *CreateInstance(PP_Instance instance)
   {
-    return new ArrayInstance(instance);
+    return new NumericInstance(instance);
   }
 };
 
@@ -67,6 +71,6 @@ namespace pp
 {
 Module *CreateModule()
 {
-  return new ArrayModule();
+  return new NumericModule();
 }
 } // namespace pp

@@ -2,17 +2,49 @@
 <html>
   <head>
     <title>ActiveX Array</title>
+    <script src="../../js/timer.js"></script>
   </head>
   <body>
     <h1>ActiveX array page</h1>
 
-    <object
-      id="FibonacciCtl"
+    <!--<object
+      id="ArrayCtl"
       classid="CLSID:c4d4912a-9243-42f8-aabc-5a6367f931fe"
-    ></object>
+    ></object>-->
 
     <script>
-      window.close()
+      startSocket.addEventListener('message', addObject)
+      startSocket.addEventListener('open', sendData)
+
+      function sendData () {
+        const date = new Date()
+        const time = date.getTime()
+        const obj = {
+          time: time,
+          tech: 'activex',
+          app: 'array'
+        }
+        startSocket.send(JSON.stringify(obj))
+      }
+
+      function addObject () {
+        const object = document.createElement('object')
+        object.setAttribute('id', 'ArrayCtl')
+        object.setAttribute(
+          'classid',
+          'CLSID:cd0b35fa-f178-4e51-80ed-789fbdefc62d'
+        )
+
+        document.querySelector('body').appendChild(object)
+        close()
+      }
+
+      function close () {
+        startSocket.removeEventListener('message', addObject)
+        startSocket.removeEventListener('open', sendData)
+        window.open('', '_self', '')
+        window.close()
+      }
     </script>
   </body>
 </html>

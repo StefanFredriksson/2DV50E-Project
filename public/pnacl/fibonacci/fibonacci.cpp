@@ -17,9 +17,15 @@ public:
 
     high_resolution_clock::time_point startTime = high_resolution_clock::now();
 
-    for (int i = 1; i <= SIZE; i++)
+    try
     {
-      nthFibonacci(i);
+      for (int i = 1; i <= SIZE; i++)
+      {
+        nthFibonacci(i);
+      }
+    }
+    catch (int e)
+    {
     }
 
     high_resolution_clock::time_point endTime = high_resolution_clock::now();

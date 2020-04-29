@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Main page</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Charts</title>
+    <link rel="stylesheet" type="text/css" href="../style.css" />
   </head>
   <body>
     <div id="ui">
-      <input id="nr-of-tests" type="number" value="30" />
       <select id="app-select">
         <option value="fibonacci">Fibonacci</option>
         <option value="array">Array</option>
         <option value="numeric">Numerics</option>
       </select>
       <select id="tech-select">
+        <option value="all">All</option>
         <option value="wasm">WebAssembly</option>
         <option value="asm">Asm.js</option>
         <option value="pnacl">PNaCl</option>
@@ -20,17 +20,20 @@
         <option value="activex">ActiveX</option>
       </select>
       <select id="browser-select"> </select>
-      <button id="start-tests" onclick="runTests()">Start tests</button>
-      <h2 id="status">Status: IDLE</h2>
+      <select id="metric-select">
+        <option value="execTime">Execution time</option>
+        <option value="loadTime">Load time</option>
+        <option value="cpu">CPU Usage</option>
+        <option value="mem">Memory Usage</option>
+      </select>
+      <button id="render-graphs" onclick="renderGraph()">Generate graph</button>
     </div>
-    <canvas id="exec-chart-container" class="chart"></canvas>
-    <canvas id="load-chart-container" class="chart"></canvas>
-    <canvas id="cpu-usage-container" class="chart"></canvas>
-    <canvas id="mem-usage-container" class="chart"></canvas>
+    <canvas id="graph" class="chart"></canvas>
+    <div id="link-div"></div>
 
-    <script src="js/populateBrowser.js"></script>
-    <script src="js/graphRendering.js"></script>
-    <script src="js/tests.js"></script>
+    <script src="../js/populateBrowser.js"></script>
+    <script src="../js/graphRendering.js"></script>
+    <script src="../js/graph.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   </body>
 </html>

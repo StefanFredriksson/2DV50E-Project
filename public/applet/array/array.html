@@ -2,16 +2,25 @@
 <html>
   <head>
     <title>Java applet</title>
+    <script src="../../js/timer.js"></script>
   </head>
   <body>
     <h1>Java applet page</h1>
-    <object
-      classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
-      type="application/x-java-applet"
-      width="200"
-      height="200"
-    >
+    <object type="application/x-java-applet" width="200" height="200">
       <param name="code" value="array.Entry.class" />
     </object>
+    <script>
+      function appDone (time, execTime) {
+        const obj = {
+          tech: 'applet',
+          app: 'array',
+          time: time,
+          execTime: execTime
+        }
+        socket.send(JSON.stringify(obj))
+        window.open('', '_self', '')
+        window.close()
+      }
+    </script>
   </body>
 </html>

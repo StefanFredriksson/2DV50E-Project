@@ -8,10 +8,10 @@
     <h1 id="page-title">PNaCl page</h1>
     <div id="listener">
       <embed
-        id="array"
+        id="numeric"
         width="0"
         height="0"
-        src="array.nmf"
+        src="numeric.nmf"
         type="application/x-pnacl"
       />
     </div>
@@ -25,7 +25,7 @@
       listener.addEventListener('message', handleMessage, true)
 
       function moduleDidLoad () {
-        ArrayModule = document.querySelector('#array')
+        ArrayModule = document.querySelector('#numeric')
         updateStatus('SUCCESS')
         ArrayModule.postMessage('Hello')
       }
@@ -36,7 +36,7 @@
         const execTime = message_event.data
         const obj = {
           tech: 'pnacl',
-          app: 'array',
+          app: 'numeric',
           time,
           execTime
         }

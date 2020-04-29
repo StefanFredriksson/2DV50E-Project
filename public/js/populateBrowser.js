@@ -8,11 +8,14 @@ techSelect.addEventListener('change', event => {
 const populateBrowser = () => {
   const browsers = getBrowsers(techSelect.value)
   browserSelect.innerHTML = ''
-  for (const browser of browsers) {
-    const option = document.createElement('option')
-    option.setAttribute('value', browser.value)
-    option.textContent = browser.label
-    browserSelect.appendChild(option)
+
+  if (!techSelect.value !== 'all') {
+    for (const browser of browsers) {
+      const option = document.createElement('option')
+      option.setAttribute('value', browser.value)
+      option.textContent = browser.label
+      browserSelect.appendChild(option)
+    }
   }
 }
 
