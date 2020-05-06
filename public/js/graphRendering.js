@@ -31,6 +31,9 @@ const renderTimeGraph = (data, id, label, xLabel, yLabel) => {
           scaleLabel: {
             display: true,
             labelString: yLabel
+          },
+          ticks: {
+            beginAtZero: true
           }
         }
       ],

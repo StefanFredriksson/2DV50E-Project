@@ -6,6 +6,51 @@ const getFiles = async () => {
   return files
 }
 
+const setData = async app => {
+  const files = await getFiles()
+  const data = []
+
+  for (const file of files) {
+    const json = require(`../lib/${file}`)
+    const keys = Object.keys(json)
+    const tech = file.split('.')[0]
+    const obj = { tech, load: '', exec: '', cpu: '', mem: '' }
+
+    for (const key of keys) {
+      if (Array.isArray(json[key][app])) {
+        for (const j of json[key][app]) {
+          if (j.endTime !== 0) {
+            const startTime = j.startTime
+            const endTime = j.endTime
+            const loadTime = endTime - startTime
+            obj.load += loadTime + ', '
+            obj.exec += j.execTime + ', '
+            obj.cpu += getMean(j.usage, 'cpu') + ', '
+            obj.mem += getMean(j.usage, 'mem') + ', '
+          }
+        }
+      }
+    }
+
+    data.push(obj)
+  }
+
+  await fse.writeFile(
+    path.join(__dirname, '..', 'data', `${app}_data.json`),
+    JSON.stringify(data, null, 2)
+  )
+}
+
+const getMean = (data, metric) => {
+  let sum = 0
+
+  for (const d of data) {
+    sum += d[metric]
+  }
+
+  return sum / data.length
+}
+
 const getMedian = data => {
   if (data.length === 0) {
     return 0
@@ -188,5 +233,6 @@ module.exports = {
   byTime,
   byExecTime,
   byLoadTime,
-  byUsage
+  byUsage,
+  setData
 }

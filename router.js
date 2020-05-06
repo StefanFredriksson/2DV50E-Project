@@ -3,53 +3,42 @@ const open = require('open')
 const path = require('path')
 const si = require('systeminformation')
 const fse = require('fs-extra')
-const { byTime, byExecTime, byLoadTime, byUsage } = require('./utils/graphData')
+const {
+  byTime,
+  byExecTime,
+  byLoadTime,
+  byUsage,
+  setData
+} = require('./utils/graphData')
 const root = 'http://localhost:4000'
 let interval
 let usage
 let currentBrowser = ''
 let startSocket = null
 
-router.ws('/test/start', (ws, req) => {
+router.ws('/timer/start', (ws, req) => {
   ws.on('message', async event => {
     startSocket = ws
     let json = {}
-    const data = JSON.parse(event)
-    currentBrowser = data.browser
-    json = require(`./lib/${data.tech}.json`)
-
-    if (json[data.browser] === undefined) {
-      json[data.browser] = {}
-    }
-    if (json[data.browser][data.app] === undefined) {
-      json[data.browser][data.app] = []
-    }
-
-    json[data.browser][data.app].push({ startTime: 0, endTime: 0 })
-    await fse.writeFile(
-      path.join(__dirname, 'lib', `${data.tech}.json`),
-      JSON.stringify(json, null, 2)
-    )
-
-    ws.send(JSON.stringify({ testFinished: false }))
-  })
-})
-
-router.ws('/measure/start', (ws, req) => {
-  ws.on('message', async event => {
-    console.log('hello?')
-    let json = {}
-    const { time, tech, app } = JSON.parse(event)
+    const { browser, app, tech, time } = JSON.parse(event)
+    currentBrowser = browser
     json = require(`./lib/${tech}.json`)
-    json[currentBrowser][app][
-      json[currentBrowser][app].length - 1
-    ].startTime = time
+
+    if (json[browser] === undefined) {
+      json[browser] = {}
+    }
+    if (json[browser][app] === undefined) {
+      json[browser][app] = []
+    }
+
+    json[browser][app].push({ startTime: time, endTime: 0 })
     await fse.writeFile(
       path.join(__dirname, 'lib', `${tech}.json`),
       JSON.stringify(json, null, 2)
     )
     measureUsage()
-    ws.send()
+    open(`${root}/${tech}/${app}`, { app: browser })
+    //ws.send(JSON.stringify({ testFinished: false }))
   })
 })
 
@@ -173,6 +162,11 @@ router.get('/:tech/numeric', (req, res) => {
   const { tech } = req.params
 
   res.sendFile(path.join(__dirname, 'public', tech, 'numeric', 'numeric.html'))
+})
+
+router.get('/average', async (req, res) => {
+  await setData('numeric')
+  res.send('<h1>OK</h1>')
 })
 
 const measureUsage = () => {

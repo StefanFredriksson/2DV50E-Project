@@ -1,6 +1,6 @@
 populateBrowser()
 let maxTests = 1
-const socket = new WebSocket('ws://localhost:4000/test/start')
+const socket = new WebSocket('ws://localhost:4000/timer/start')
 let tech = ''
 let app = ''
 let browser = ''
@@ -23,9 +23,7 @@ socket.addEventListener('message', async event => {
     fetch(`http://localhost:4000/start/${tech}/${app}/${browser}`)
   } else {
     if (testCount < maxTests) {
-      setTimeout(() => {
-        startTests()
-      }, 500)
+      startTests()
     } else {
       const button = document.querySelector('#start-tests')
       const status = document.querySelector('#status')
@@ -48,7 +46,9 @@ const startTests = () => {
   const button = document.querySelector('#start-tests')
   button.disabled = true
   status.textContent = 'Status: RUNNING'
-  socket.send(JSON.stringify({ tech, app, browser }))
+  const date = new Date()
+  const time = date.getTime()
+  socket.send(JSON.stringify({ tech, app, browser, time }))
 }
 
 const runTests = () => {
