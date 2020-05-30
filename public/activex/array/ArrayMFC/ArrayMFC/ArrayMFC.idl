@@ -1,0 +1,49 @@
+// ArrayMFC.idl : type library source for ActiveX Control project.
+
+// This file will be processed by the MIDL compiler tool to
+// produce the type library (ArrayMFC.tlb) that will become a resource in
+// ArrayMFC.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(7412c5c9-747d-47ce-bf98-51e918a47779), version(1.0),
+  control ]
+library ArrayMFCLib
+{
+	importlib(STDOLE_TLB);
+
+	//  Primary dispatch interface for CArrayMFCCtrl
+	[ 
+		uuid(dc3ec1eb-ecbd-4d69-a07c-59f3a41d3ecc)
+	]
+	dispinterface _DArrayMFC
+	{
+		properties:
+		methods:
+	};
+
+	//  Event dispatch interface for CArrayMFCCtrl
+
+	[ 
+		uuid(b1739b13-016e-47f1-98cf-83612d1c6add)
+	]
+	dispinterface _DArrayMFCEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+	};
+
+	//  Class information for CArrayMFCCtrl
+	[
+		uuid(b8d52eb1-bb12-40f4-abaa-3139629fdd52)
+	]
+	coclass ArrayMFC
+	{
+		[default] dispinterface _DArrayMFC;
+		[default, source] dispinterface _DArrayMFCEvents;
+	};
+
+};

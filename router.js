@@ -3,26 +3,22 @@ const open = require('open')
 const path = require('path')
 const si = require('systeminformation')
 const fse = require('fs-extra')
-const {
-  byTime,
-  byExecTime,
-  byLoadTime,
-  byUsage,
-  setData
-} = require('./utils/graphData')
+const { byTime, byUsage, setData, getMedian } = require('./utils/graphData')
 const root = 'http://localhost:4000'
+const hardware = 'desktop'
 let interval
 let usage
 let currentBrowser = ''
 let startSocket = null
 
+/* Save start time, start measuring usage, and open application in a new browser instance */
 router.ws('/timer/start', (ws, req) => {
   ws.on('message', async event => {
     startSocket = ws
     let json = {}
     const { browser, app, tech, time } = JSON.parse(event)
     currentBrowser = browser
-    json = require(`./lib/${tech}.json`)
+    json = require(`./lib/${hardware}_${tech}.json`)
 
     if (json[browser] === undefined) {
       json[browser] = {}
@@ -33,57 +29,32 @@ router.ws('/timer/start', (ws, req) => {
 
     json[browser][app].push({ startTime: time, endTime: 0 })
     await fse.writeFile(
-      path.join(__dirname, 'lib', `${tech}.json`),
+      path.join(__dirname, 'lib', `${hardware}_${tech}.json`),
       JSON.stringify(json, null, 2)
     )
     measureUsage()
     open(`${root}/${tech}/${app}`, { app: browser })
-    //ws.send(JSON.stringify({ testFinished: false }))
   })
 })
 
 router.ws('/timer/end', (ws, req) => {
   ws.on('message', async event => {
-    let json = {}
-    clearInterval(interval)
-    const data = JSON.parse(event)
-    json = require(`./lib/${data.tech}.json`)
-    json[currentBrowser][data.app][
-      json[currentBrowser][data.app].length - 1
-    ].endTime = data.time
-    json[currentBrowser][data.app][
-      json[currentBrowser][data.app].length - 1
-    ].execTime = data.execTime
-    json[currentBrowser][data.app][
-      json[currentBrowser][data.app].length - 1
-    ].usage = usage
-    await fse.writeFile(
-      path.join(__dirname, 'lib', `${data.tech}.json`),
-      JSON.stringify(json, null, 2)
-    )
-
-    const graph = await byExecTime(data.app)
-    const loadTimeGraph = await byLoadTime(data.app)
-    const cpuUsageGraph = await byUsage(data.app, 'cpu')
-    const memUsageGraph = await byUsage(data.app, 'mem')
-
-    startSocket.send(
-      JSON.stringify({
-        testFinished: true,
-        graph,
-        loadTimeGraph,
-        cpuUsageGraph,
-        memUsageGraph
-      })
-    )
+    handleEnd(JSON.parse(event))
   })
 })
 
 router.get('/timer/end', async (req, res) => {
-  const { tech, app, time, execTime } = req.query
+  handleEnd(req.query)
+
+  res.send('<h1>OK</h1>')
+})
+
+/* Saves the data after application is finished running. Also, sends graph data to base application. */
+const handleEnd = async query => {
+  const { tech, app, time, execTime } = query
   let json = {}
   clearInterval(interval)
-  json = require(`./lib/${tech}.json`)
+  json = require(`./lib/${hardware}_${tech}.json`)
   json[currentBrowser][app][
     json[currentBrowser][app].length - 1
   ].endTime = parseInt(time)
@@ -92,14 +63,14 @@ router.get('/timer/end', async (req, res) => {
   ].execTime = parseInt(execTime)
   json[currentBrowser][app][json[currentBrowser][app].length - 1].usage = usage
   await fse.writeFile(
-    path.join(__dirname, 'lib', `${tech}.json`),
+    path.join(__dirname, 'lib', `${hardware}_${tech}.json`),
     JSON.stringify(json, null, 2)
   )
 
-  const graph = await byExecTime(app)
-  const loadTimeGraph = await byLoadTime(app)
-  const cpuUsageGraph = await byUsage(app, 'cpu')
-  const memUsageGraph = await byUsage(app, 'mem')
+  const graph = await byTime(app, 'execTime')
+  const loadTimeGraph = await byTime(app, 'loadTime')
+  const cpuUsageGraph = await byUsage(app, 'cpu', hardware)
+  const memUsageGraph = await byUsage(app, 'mem', hardware)
   startSocket.send(
     JSON.stringify({
       testFinished: true,
@@ -109,9 +80,7 @@ router.get('/timer/end', async (req, res) => {
       memUsageGraph
     })
   )
-
-  res.send('<h1>OK</h1>')
-})
+}
 
 router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
@@ -121,6 +90,7 @@ router.get('/graph', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'graph', 'charts.html'))
 })
 
+/* Sends the requests data for the graph. */
 router.ws('/graph', (ws, req) => {
   ws.on('message', async event => {
     const { app, tech, browser, metric } = JSON.parse(event)
@@ -129,19 +99,11 @@ router.ws('/graph', (ws, req) => {
     if (metric === 'execTime' || metric === 'loadTime') {
       graph = await byTime(app, metric)
     } else if (metric === 'cpu' || metric === 'mem') {
-      graph = await byUsage(app, metric)
+      graph = await byUsage(app, metric, hardware)
     }
 
     ws.send(JSON.stringify({ graph, metric, app }))
   })
-})
-
-router.get('/start/:tech/:app/:browser', async (req, res) => {
-  const { tech, app, browser } = req.params
-
-  open(`${root}/${tech}/${app}`, { app: browser })
-
-  res.json({ message: 'OK' })
 })
 
 router.get('/:tech/fibonacci', (req, res) => {
@@ -169,6 +131,7 @@ router.get('/average', async (req, res) => {
   res.send('<h1>OK</h1>')
 })
 
+/* Measures the cpu and memory usage every 500ms. */
 const measureUsage = () => {
   usage = []
   interval = setInterval(async () => {

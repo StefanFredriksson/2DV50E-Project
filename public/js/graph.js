@@ -15,7 +15,7 @@ socket.addEventListener('message', event => {
       label = `${app}: execution time`
     }
 
-    renderTimeGraph(graph, 'graph', label, xLabel, yLabel)
+    renderTimeGraph(graph, 'graph', label, xLabel, yLabel, false)
   } else if (metric === 'cpu' || metric === 'mem') {
     xLabel = 'time (ms)'
     if (metric === 'cpu') {
@@ -23,7 +23,7 @@ socket.addEventListener('message', event => {
     } else {
       yLabel = 'Memory usage (MB)'
     }
-    renderUsageGraph(graph, 'graph', xLabel, yLabel)
+    renderUsageGraph(graph, 'graph', xLabel, yLabel, false)
   }
 })
 

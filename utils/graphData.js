@@ -6,6 +6,8 @@ const getFiles = async () => {
   return files
 }
 
+/** Extracts the data from the main files and adds it in to a new file
+in a way that is easy to copy pase, for use when calculating the statistically signficant difference. */
 const setData = async app => {
   const files = await getFiles()
   const data = []
@@ -13,10 +15,13 @@ const setData = async app => {
   for (const file of files) {
     const json = require(`../lib/${file}`)
     const keys = Object.keys(json)
-    const tech = file.split('.')[0]
-    const obj = { tech, load: '', exec: '', cpu: '', mem: '' }
+    const obj = { tech: '', load: '', exec: '', cpu: '', mem: '' }
 
     for (const key of keys) {
+      const t = file.split('.')[0]
+      const hardware = t.split('_')[0]
+      const tech = t.split('_')[1]
+      obj.tech = `${hardware}: ${tech}`
       if (Array.isArray(json[key][app])) {
         for (const j of json[key][app]) {
           if (j.endTime !== 0) {
@@ -25,8 +30,11 @@ const setData = async app => {
             const loadTime = endTime - startTime
             obj.load += loadTime + ', '
             obj.exec += j.execTime + ', '
-            obj.cpu += getMean(j.usage, 'cpu') + ', '
-            obj.mem += getMean(j.usage, 'mem') + ', '
+            if (j.usage.length > 0) {
+              obj.cpu += getMean(j.usage, 'cpu') + ', '
+              const mem = getMean(j.usage, 'mem') / 1000000
+              obj.mem += mem + ', '
+            }
           }
         }
       }
@@ -72,16 +80,36 @@ const getMedian = data => {
   return median
 }
 
+/** Returns the data for either execution time or load time that can be used
+to display the data in a graph. */
 const byTime = async (app, metric) => {
   const files = await getFiles()
   const graphData = { labels: [], data: [] }
+  const platform = {
+    desktop: {
+      color: '#3e95cd',
+      label: 'Desktop',
+      data: []
+    },
+    laptop: {
+      color: '#8e5ea2',
+      label: 'Laptop',
+      data: []
+    }
+  }
 
   for (const file of files) {
     const json = require(`../lib/${file}`)
     const keys = Object.keys(json)
-    const tech = file.split('.')
+    const t = file.split('.')[0]
+    const d = t.split('_')
+    const borderColor =
+      d[0] === 'desktop' ? 'rgb(255, 166, 0)' : 'rgb(2, 136, 2)'
     const times = []
-    graphData.labels.push(tech[0])
+
+    if (!graphData.labels.includes(d[1])) {
+      graphData.labels.push(d[1])
+    }
 
     for (const key of keys) {
       if (Array.isArray(json[key][app])) {
@@ -95,67 +123,29 @@ const byTime = async (app, metric) => {
       }
     }
 
-    graphData.data.push(getMedian(times))
+    platform[d[0]].data.push(getMedian(times))
   }
 
-  return graphData
-}
+  const keys = Object.keys(platform)
 
-const byLoadTime = async app => {
-  const files = await getFiles()
-  const graphData = { labels: [], data: [] }
-
-  for (const file of files) {
-    const json = require(`../lib/${file}`)
-    const keys = Object.keys(json)
-    const tech = file.split('.')
-    const loadTimes = []
-    graphData.labels.push(tech[0])
-
-    for (const key of keys) {
-      if (Array.isArray(json[key][app])) {
-        for (const data of json[key][app]) {
-          if (data.endTime) {
-            loadTimes.push(data.endTime - data.startTime)
-          }
-        }
-      }
+  for (const key of keys) {
+    const obj = {
+      borderColor: platform[key].color,
+      backgroundColor: platform[key].color,
+      label: platform[key].label,
+      data: platform[key].data
     }
 
-    graphData.data.push(getMedian(loadTimes))
+    graphData.data.push(obj)
   }
 
   return graphData
 }
 
-const byExecTime = async app => {
-  const files = await getFiles()
-  const graphData = { labels: [], data: [] }
-
-  for (const file of files) {
-    const json = require(`../lib/${file}`)
-    const keys = Object.keys(json)
-    const tech = file.split('.')
-    const execTimes = []
-    graphData.labels.push(tech[0])
-
-    for (const key of keys) {
-      if (Array.isArray(json[key][app])) {
-        for (const data of json[key][app]) {
-          if (data.execTime) {
-            execTimes.push(data.execTime)
-          }
-        }
-      }
-    }
-
-    graphData.data.push(getMedian(execTimes))
-  }
-
-  return graphData
-}
-
-const byUsage = async (app, metric) => {
+/** Returns the data for either the cpu usage or the memory usage
+ * and the data can be used to display in a graph.
+ */
+const byUsage = async (app, metric, hardware) => {
   const colors = {
     wasm: 'rgb(255, 166, 0)',
     asm: 'rgb(0, 0, 0)',
@@ -168,12 +158,16 @@ const byUsage = async (app, metric) => {
   let max = 0
 
   for (const file of files) {
+    const h = file.split('.')[0].split('_')[0]
+    if (h !== hardware) {
+      continue
+    }
     const json = require(`../lib/${file}`)
     const keys = Object.keys(json)
-    const tech = file.split('.')
+    const tech = file.split('.')[0].split('_')[1]
     const obj = {
-      label: tech[0],
-      borderColor: colors[tech[0]],
+      label: tech,
+      borderColor: colors[tech],
       fill: false,
       data: []
     }
@@ -206,11 +200,18 @@ const byUsage = async (app, metric) => {
 const getUsageMedian = (usage, metric) => {
   const median = []
   let max = 0
+  const lengths = []
   for (let i = 0; i < usage.length; i++) {
     if (usage[i].length > max) {
       max = usage[i].length
     }
   }
+
+  for (let i = 0; i < usage.length; i++) {
+    lengths.push(usage[i].length)
+  }
+
+  const medianLength = getMedian(lengths)
 
   for (let i = 0; i < max; i++) {
     const use = []
@@ -231,8 +232,7 @@ const getUsageMedian = (usage, metric) => {
 
 module.exports = {
   byTime,
-  byExecTime,
-  byLoadTime,
   byUsage,
-  setData
+  setData,
+  getMedian
 }

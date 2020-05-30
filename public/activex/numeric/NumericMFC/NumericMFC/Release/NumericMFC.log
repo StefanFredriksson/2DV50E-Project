@@ -1,0 +1,33 @@
+﻿  Processing .\NumericMFC.idl
+  NumericMFC.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\oaidl.idl
+  oaidl.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\objidl.idl
+  objidl.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\unknwn.idl
+  unknwn.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\wtypes.idl
+  wtypes.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\wtypesbase.idl
+  wtypesbase.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\basetsd.h
+  basetsd.h
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\guiddef.h
+  guiddef.h
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\oaidl.acf
+  oaidl.acf
+  pch.cpp
+  NumericMFC.cpp
+  NumericMFCCtrl.cpp
+i:\documents\visual studio 2017\projects\numericmfc\numericmfc\numericmfcctrl.cpp(119): warning C4244: 'initializing': conversion from '_Rep' to 'int', possible loss of data
+          with
+          [
+              _Rep=__int64
+          ]
+i:\documents\visual studio 2017\projects\numericmfc\numericmfc\numericmfcctrl.cpp(132): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  NumericMFCPropPage.cpp
+     Creating library I:\Documents\Visual Studio 2017\Projects\NumericMFC\Release\NumericMFC.lib and object I:\Documents\Visual Studio 2017\Projects\NumericMFC\Release\NumericMFC.exp
+  Generating code
+  All 198 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  NumericMFC.vcxproj -> I:\Documents\Visual Studio 2017\Projects\NumericMFC\Release\NumericMFC.ocx

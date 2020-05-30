@@ -1,4 +1,8 @@
 let chart = null
+let execChart = null
+let loadChart = null
+let cpuChart = null
+let memChart = null
 
 const done = () => {
   let a = document.querySelector('#link')
@@ -14,17 +18,11 @@ const done = () => {
   a.href = url
 }
 
-const renderTimeGraph = (data, id, label, xLabel, yLabel) => {
+const renderTimeGraph = (data, id, label, xLabel, yLabel, isTests) => {
   var ctx = document.getElementById(id).getContext('2d')
-
-  if (chart) {
-    chart.destroy()
-  }
+  destroyChart(id)
 
   const options = {
-    animation: {
-      onComplete: done
-    },
     scales: {
       yAxes: [
         {
@@ -48,35 +46,30 @@ const renderTimeGraph = (data, id, label, xLabel, yLabel) => {
     }
   }
 
-  chart = new Chart(ctx, {
+  if (!isTests) {
+    options.animation = {
+      onComplete: done
+    }
+  }
+
+  const c = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: data.labels,
-      datasets: [
-        {
-          label,
-          backgroundColor: 'rgb(55, 55, 133)',
-          borderColor: 'rgb(135, 135, 248)',
-          data: data.data
-        }
-      ]
+      datasets: data.data
     },
     display: true,
     options
   })
+
+  setChart(id, c)
 }
 
-const renderUsageGraph = (data, id, xLabel, yLabel) => {
+const renderUsageGraph = (data, id, xLabel, yLabel, isTests) => {
   var ctx = document.getElementById(id).getContext('2d')
-
-  if (chart) {
-    chart.destroy()
-  }
+  destroyChart(id)
 
   const options = {
-    animation: {
-      onComplete: done
-    },
     scales: {
       yAxes: [
         {
@@ -97,7 +90,13 @@ const renderUsageGraph = (data, id, xLabel, yLabel) => {
     }
   }
 
-  chart = new Chart(ctx, {
+  if (!isTests) {
+    options.animation = {
+      onComplete: done
+    }
+  }
+
+  const c = new Chart(ctx, {
     type: 'line',
     data: {
       labels: data.labels,
@@ -105,82 +104,44 @@ const renderUsageGraph = (data, id, xLabel, yLabel) => {
     },
     options
   })
+
+  setChart(id, c)
 }
 
-const renderExecGraph = data => {
-  var ctx = document.getElementById('exec-chart-container').getContext('2d')
-
-  if (execChart) {
-    execChart.destroy()
+const setChart = (id, c) => {
+  if (id === 'graph') {
+    chart = c
+  } else if (id === 'exec-chart-container') {
+    execChart = c
+  } else if (id === 'load-chart-container') {
+    loadChart = c
+  } else if (id === 'cpu-usage-container') {
+    cpuChart = c
+  } else if (id === 'mem-usage-container') {
+    memChart = c
   }
-
-  execChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: `${app}: execution time`,
-          backgroundColor: 'rgb(55, 55, 133)',
-          borderColor: 'rgb(135, 135, 248)',
-          data: data.data
-        }
-      ]
-    }
-  })
 }
 
-const renderLoadTimeGraph = data => {
-  var ctx = document.getElementById('load-chart-container').getContext('2d')
-
-  if (loadChart) {
-    loadChart.destroy()
-  }
-
-  loadChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: `${app}: load time`,
-          backgroundColor: 'rgb(55, 55, 133)',
-          borderColor: 'rgb(135, 135, 248)',
-          data: data.data
-        }
-      ]
+const destroyChart = id => {
+  if (id === 'graph') {
+    if (chart) {
+      chart.destroy()
     }
-  })
-}
-
-const renderCpuUsageGraph = data => {
-  var ctx = document.getElementById('cpu-usage-container').getContext('2d')
-
-  if (cpuUsageChart) {
-    cpuUsageChart.destroy()
-  }
-
-  cpuUsageChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: data.labels,
-      datasets: data.datasets
+  } else if (id === 'exec-chart-container') {
+    if (execChart) {
+      execChart.destroy()
     }
-  })
-}
-
-const renderMemUsageGraph = data => {
-  var ctx = document.getElementById('mem-usage-container').getContext('2d')
-
-  if (memUsageChart) {
-    memUsageChart.destroy()
-  }
-
-  memUsageChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: data.labels,
-      datasets: data.datasets
+  } else if (id === 'load-chart-container') {
+    if (loadChart) {
+      loadChart.destroy()
     }
-  })
+  } else if (id === 'cpu-usage-container') {
+    if (cpuChart) {
+      cpuChart.destroy()
+    }
+  } else if (id === 'mem-usage-container') {
+    if (memChart) {
+      memChart.destroy()
+    }
+  }
 }

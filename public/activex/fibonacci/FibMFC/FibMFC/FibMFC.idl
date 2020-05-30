@@ -1,0 +1,49 @@
+// FibMFC.idl : type library source for ActiveX Control project.
+
+// This file will be processed by the MIDL compiler tool to
+// produce the type library (FibMFC.tlb) that will become a resource in
+// FibMFC.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(bff2d06b-899d-4dc5-a13d-69ed675d7c45), version(1.0),
+  control ]
+library FibMFCLib
+{
+	importlib(STDOLE_TLB);
+
+	//  Primary dispatch interface for CFibMFCCtrl
+	[ 
+		uuid(708118d8-6940-4bce-8c16-013b03136f0e)
+	]
+	dispinterface _DFibMFC
+	{
+		properties:
+		methods:
+	};
+
+	//  Event dispatch interface for CFibMFCCtrl
+
+	[ 
+		uuid(6f2efa9c-4d40-4a52-9015-fa2daf84af94)
+	]
+	dispinterface _DFibMFCEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+	};
+
+	//  Class information for CFibMFCCtrl
+	[
+		uuid(7fa6ff4c-21fa-4545-9a76-a211a9d4498f)
+	]
+	coclass FibMFC
+	{
+		[default] dispinterface _DFibMFC;
+		[default, source] dispinterface _DFibMFCEvents;
+	};
+
+};

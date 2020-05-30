@@ -4,8 +4,8 @@
     <title>PNaCl</title>
     <script src="../../js/timer.js"></script>
   </head>
-  <body onload="pageDidLoad()">
-    <h1 id="page-title">PNaCl page</h1>
+  <body>
+    <h1>PNaCl Array page</h1>
     <div id="listener">
       <embed
         id="array"
@@ -16,17 +16,14 @@
       />
     </div>
 
-    <h2>Status <code id="statusField">NO-STATUS</code></h2>
-    <script type="text/javascript">
+    <script>
       ArrayModule = null
-      statusText = 'NO-STATUS'
       const listener = document.querySelector('#listener')
       listener.addEventListener('load', moduleDidLoad, true)
       listener.addEventListener('message', handleMessage, true)
 
       function moduleDidLoad () {
         ArrayModule = document.querySelector('#array')
-        updateStatus('SUCCESS')
         ArrayModule.postMessage('Hello')
       }
 
@@ -44,26 +41,6 @@
         listener.removeEventListener('message', handleMessage, true)
         socket.send(JSON.stringify(obj))
         window.close()
-      }
-
-      function pageDidLoad () {
-        if (ArrayModule === null) {
-          updateStatus('LOADING...')
-        } else {
-          updateStatus()
-        }
-      }
-
-      function updateStatus (opt_message) {
-        if (opt_message) {
-          statusText = opt_message
-        }
-
-        const statusField = document.querySelector('#statusField')
-
-        if (statusField) {
-          statusField.textContent = statusText
-        }
       }
     </script>
   </body>

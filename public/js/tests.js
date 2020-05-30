@@ -5,10 +5,6 @@ let tech = ''
 let app = ''
 let browser = ''
 let testCount = 0
-let execChart = null
-let loadChart = null
-let cpuUsageChart = null
-let memUsageChart = null
 
 socket.addEventListener('message', async event => {
   const {
@@ -19,21 +15,44 @@ socket.addEventListener('message', async event => {
     memUsageGraph
   } = JSON.parse(event.data)
 
-  if (!testFinished) {
-    fetch(`http://localhost:4000/start/${tech}/${app}/${browser}`)
+  if (testCount < maxTests) {
+    startTests()
   } else {
-    if (testCount < maxTests) {
-      startTests()
-    } else {
-      const button = document.querySelector('#start-tests')
-      const status = document.querySelector('#status')
-      status.textContent = 'Status: FINISHED'
-      button.disabled = false
-      renderExecGraph(graph)
-      renderLoadTimeGraph(loadTimeGraph)
-      renderCpuUsageGraph(cpuUsageGraph)
-      renderMemUsageGraph(memUsageGraph)
-    }
+    const button = document.querySelector('#start-tests')
+    const status = document.querySelector('#status')
+    status.textContent = 'Status: FINISHED'
+    button.disabled = false
+
+    renderTimeGraph(
+      graph,
+      'exec-chart-container',
+      `${app}: execution time`,
+      'technologies',
+      'time (ms)',
+      true
+    )
+    renderTimeGraph(
+      loadTimeGraph,
+      'load-chart-container',
+      `${app}: load time`,
+      'technologies',
+      'time (ms)',
+      true
+    )
+    renderUsageGraph(
+      cpuUsageGraph,
+      'cpu-usage-container',
+      'time (ms)',
+      'CPU usage (%)',
+      true
+    )
+    renderUsageGraph(
+      memUsageGraph,
+      'mem-usage-container',
+      'time (ms)',
+      'Memory usage (MB)',
+      true
+    )
   }
 })
 

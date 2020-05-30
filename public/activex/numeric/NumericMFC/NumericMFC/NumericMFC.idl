@@ -1,0 +1,49 @@
+// NumericMFC.idl : type library source for ActiveX Control project.
+
+// This file will be processed by the MIDL compiler tool to
+// produce the type library (NumericMFC.tlb) that will become a resource in
+// NumericMFC.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(93e04360-feb5-4167-8efc-5bee2b583cdc), version(1.0),
+  control ]
+library NumericMFCLib
+{
+	importlib(STDOLE_TLB);
+
+	//  Primary dispatch interface for CNumericMFCCtrl
+	[ 
+		uuid(da81fade-9353-4b21-b351-c14dd68fe480)
+	]
+	dispinterface _DNumericMFC
+	{
+		properties:
+		methods:
+	};
+
+	//  Event dispatch interface for CNumericMFCCtrl
+
+	[ 
+		uuid(55265547-7b55-46bd-bcff-07e9fbed432a)
+	]
+	dispinterface _DNumericMFCEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+	};
+
+	//  Class information for CNumericMFCCtrl
+	[
+		uuid(963ff900-6d5f-4956-87ee-4322bf91eb19)
+	]
+	coclass NumericMFC
+	{
+		[default] dispinterface _DNumericMFC;
+		[default, source] dispinterface _DNumericMFCEvents;
+	};
+
+};

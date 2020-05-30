@@ -1,45 +1,13 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
   <head>
-    <meta charset="utf-8" />
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <title>Wasm</title>
     <script src="../../js/timer.js"></script>
   </head>
   <body>
-    <style>
-      #output {
-        height: 400px;
-        width: 200px;
-      }
-    </style>
-    <h1 id="status">Status: Waiting</h1>
-    <textarea id="output"></textarea>
-    <script type="text/javascript">
-      var Module = {
-        preRun: [],
-        preInit: function () {
-          const status = document.querySelector('#status')
-          status.textContent = 'Status: Running'
-        },
-        print: (function () {
-          const output = document.querySelector('#output')
-          if (output) {
-            output.value = ''
-          }
-
-          return function (text) {
-            if (arguments.length > 1) {
-              text = Array.prototype.slice.call(arguments).join(' ')
-            }
-
-            if (output) {
-              output.value += text + '\n'
-              output.scrollTop = output.scrollHeight
-            }
-          }
-        })()
-      }
+    <h1>WebAssembly Array page</h1>
+    <script>
+      var Module = {}
 
       Module.postRun = [
         function () {
@@ -55,11 +23,9 @@
           }
           socket.send(JSON.stringify(obj))
           window.close()
-          const status = document.querySelector('#status')
-          status.textContent = 'Status: Finished'
         }
       ]
     </script>
-    <script async src="array.js"></script>
+    <script src="array.js"></script>
   </body>
 </html>

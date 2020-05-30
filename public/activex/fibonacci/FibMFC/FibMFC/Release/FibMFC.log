@@ -1,0 +1,32 @@
+﻿  Processing .\FibMFC.idl
+  FibMFC.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\oaidl.idl
+  oaidl.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\objidl.idl
+  objidl.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\unknwn.idl
+  unknwn.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\wtypes.idl
+  wtypes.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\wtypesbase.idl
+  wtypesbase.idl
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\basetsd.h
+  basetsd.h
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\guiddef.h
+  guiddef.h
+  Processing C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\oaidl.acf
+  oaidl.acf
+  pch.cpp
+  FibMFC.cpp
+  FibMFCCtrl.cpp
+i:\documents\visual studio 2017\projects\fibmfc\fibmfc\fibmfcctrl.cpp(123): warning C4244: 'initializing': conversion from '_Rep' to 'int', possible loss of data
+          with
+          [
+              _Rep=__int64
+          ]
+  FibMFCPropPage.cpp
+     Creating library I:\Documents\Visual Studio 2017\Projects\FibMFC\Release\FibMFC.lib and object I:\Documents\Visual Studio 2017\Projects\FibMFC\Release\FibMFC.exp
+  Generating code
+  All 309 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  FibMFC.vcxproj -> I:\Documents\Visual Studio 2017\Projects\FibMFC\Release\FibMFC.ocx
