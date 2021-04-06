@@ -18,7 +18,7 @@
     "open": "^7.0.2",
     "path": "^0.12.7",
     "pidusage": "^2.0.18",
-    "systeminformation": "^4.23.0"
+    "systeminformation": "^5.6.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
